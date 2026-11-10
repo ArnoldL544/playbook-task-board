@@ -1,6 +1,7 @@
-import { addDaysISO } from '../lib/format';
+import { useRef } from 'react';
+import { addDaysISO, formatLongDate } from '../lib/format';
 import { PRIORITIES, STATUSES, type Label, type Member, type Priority, type Status } from '../types';
-import { PlusIcon, PriorityIcon } from './Icons';
+import { CalendarIcon, PlusIcon, PriorityIcon } from './Icons';
 import { Avatar, CheckList, LabelChip, Popover } from './ui';
 
 /* Reusable task fields shared by the create dialog and the detail panel. */
@@ -49,6 +50,7 @@ export function DueDateField({
   onChange: (d: string | null) => void;
   id?: string;
 }) {
+  const native = useRef<HTMLInputElement>(null);
   const quick = [
     { name: 'Today', value: addDaysISO(0) },
     { name: 'Tomorrow', value: addDaysISO(1) },
@@ -56,13 +58,36 @@ export function DueDateField({
   ];
   return (
     <div className="due-field">
-      <input
-        id={id}
-        type="date"
-        className="input"
-        value={value ?? ''}
-        onChange={(e) => onChange(e.target.value || null)}
-      />
+      {/* The visible control is always English ("Nov 14, 2026" / "Pick a date");
+          the browser's own date picker opens on click, whatever the OS language. */}
+      <div className="date-picker">
+        <button
+          id={id}
+          type="button"
+          className={`input date-picker__btn${value ? '' : ' is-empty'}`}
+          onClick={() => {
+            const el = native.current;
+            if (!el) return;
+            try {
+              el.showPicker();
+            } catch {
+              el.focus();
+            }
+          }}
+        >
+          <CalendarIcon size={14} />
+          {value ? formatLongDate(value) : 'Pick a date'}
+        </button>
+        <input
+          ref={native}
+          type="date"
+          className="date-picker__native"
+          value={value ?? ''}
+          onChange={(e) => onChange(e.target.value || null)}
+          tabIndex={-1}
+          aria-hidden="true"
+        />
+      </div>
       <div className="due-field__quick">
         {quick.map((q) => (
           <button

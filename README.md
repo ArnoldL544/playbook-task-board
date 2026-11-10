@@ -2,7 +2,7 @@
 
 A polished, Linear-inspired Kanban board built with **React + TypeScript + Vite** on top of **Supabase** (Postgres, anonymous auth, Row Level Security).
 
-- **Live demo:** _add your Vercel URL here_
+- **Live demo:** https://playbook-task-board.vercel.app
 - **Stack:** React 19, TypeScript, Vite, Supabase JS v2, plain CSS with design tokens (no UI kit)
 
 ## Features

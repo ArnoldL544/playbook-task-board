@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import * as api from '../lib/api';
-import { timeAgo } from '../lib/format';
+import { LOCALE, timeAgo } from '../lib/format';
 import { STATUS_NAME, type Activity, type Comment, type Label, type Member, type Status, type Task, type TaskPatch } from '../types';
 import type { Notify } from '../hooks/useBoard';
 import { ActivityIcon, AlertIcon, CloseIcon, CommentIcon, TrashIcon } from './Icons';
@@ -306,7 +306,7 @@ function Comments({
             <li key={c.id} className="comment">
               <div className="comment__head">
                 <span className="comment__author">You</span>
-                <time dateTime={c.created_at} title={new Date(c.created_at).toLocaleString()}>
+                <time dateTime={c.created_at} title={new Date(c.created_at).toLocaleString(LOCALE)}>
                   {timeAgo(c.created_at)}
                 </time>
                 <button type="button" className="comment__delete" onClick={() => remove(c.id)} aria-label="Delete comment">
@@ -419,7 +419,7 @@ function ActivityLog({ task }: { task: Task }) {
         <li key={a.id} className={`timeline__item timeline__item--${a.kind}`}>
           <span className="timeline__dot" aria-hidden="true" />
           <span className="timeline__text">{describe(a)}</span>
-          <time className="timeline__time" dateTime={a.created_at} title={new Date(a.created_at).toLocaleString()}>
+          <time className="timeline__time" dateTime={a.created_at} title={new Date(a.created_at).toLocaleString(LOCALE)}>
             {timeAgo(a.created_at)}
           </time>
         </li>

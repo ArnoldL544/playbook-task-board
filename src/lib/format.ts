@@ -1,5 +1,8 @@
 /* Date, color and ordering helpers shared across the UI. */
 
+/** The UI copy is English, so dates are formatted in English regardless of the viewer's OS language. */
+export const LOCALE = 'en-US';
+
 export type DueState = 'overdue' | 'today' | 'soon' | 'later' | 'none';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -43,11 +46,16 @@ export function formatDue(iso: string): string {
   if (days < 0 && days > -7) return `${-days} days ago`;
   const date = parseLocalDate(iso);
   const sameYear = date.getFullYear() === new Date().getFullYear();
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(LOCALE, {
     month: 'short',
     day: 'numeric',
     ...(sameYear ? {} : { year: 'numeric' }),
   });
+}
+
+/** "Nov 14, 2026" — used by the date field. */
+export function formatLongDate(iso: string): string {
+  return parseLocalDate(iso).toLocaleDateString(LOCALE, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 export function addDaysISO(days: number): string {
@@ -57,7 +65,7 @@ export function addDaysISO(days: number): string {
 }
 
 const rtf = typeof Intl !== 'undefined' && 'RelativeTimeFormat' in Intl
-  ? new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
+  ? new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
   : null;
 
 /** "just now", "5 minutes ago", "2 hours ago", "yesterday", or a date. */
@@ -65,11 +73,11 @@ export function timeAgo(isoTimestamp: string): string {
   const diff = (new Date(isoTimestamp).getTime() - Date.now()) / 1000;
   const abs = Math.abs(diff);
   if (abs < 45) return 'just now';
-  if (!rtf) return new Date(isoTimestamp).toLocaleString();
+  if (!rtf) return new Date(isoTimestamp).toLocaleString(LOCALE);
   if (abs < 3600) return rtf.format(Math.round(diff / 60), 'minute');
   if (abs < 86400) return rtf.format(Math.round(diff / 3600), 'hour');
   if (abs < 86400 * 7) return rtf.format(Math.round(diff / 86400), 'day');
-  return new Date(isoTimestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return new Date(isoTimestamp).toLocaleDateString(LOCALE, { month: 'short', day: 'numeric' });
 }
 
 export function initials(name: string): string {
